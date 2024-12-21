@@ -1,2 +1,9 @@
-package model;public interface Car {
+package model;
+
+public interface Car {
+    String getModel();
+    String getType();
+    boolean isAvailable();
+    void setAvailable(boolean available);
+    double getBasePrice(); // Yazım hatası düzeltildi
 }

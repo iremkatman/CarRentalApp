@@ -1,11 +1,11 @@
 package model;
 
-public class Luxury implements Car {
+public class Sports implements Car {
     private String model;
     private boolean available;
-    private final double basePrice = 200.0; // Lüks araçlar için fiyat
+    private final double basePrice = 150.0; // Örnek fiyat
 
-    public Luxury(String model, boolean available) {
+    public Sports(String model, boolean available) {
         this.model = model;
         this.available = available;
     }
@@ -17,7 +17,7 @@ public class Luxury implements Car {
 
     @Override
     public String getType() {
-        return "Luxury";
+        return "Sports";
     }
 
     @Override

@@ -1,34 +1,76 @@
 package controller;
 
 import model.User;
-import view.SignupView;
+import view.RegisterView;
+import view.LoginView;
 
 import javax.swing.*;
+import java.util.regex.Pattern;
 
-public class SignupController {
-    private SignupView signupView;
+public class RegisterController {
+    private RegisterView registerView;
     private UserController userController;
 
-    public SignupController(SignupView signupView, UserController userController) {
-        this.signupView = signupView;
+    public RegisterController(RegisterView registerView, UserController userController) {
+        this.registerView = registerView;
         this.userController = userController;
 
-        signupView.getSignupButton().addActionListener(e -> createAccount());
+        registerView.getRegisterButton().addActionListener(e -> register());
+        registerView.getGoToLoginButton().addActionListener(e -> openLoginView());
     }
 
-    private void createAccount() {
-        String username = signupView.getUsernameField().getText();
-        String password = new String(signupView.getPasswordField().getPassword());
-        String role = (String) signupView.getRoleComboBox().getSelectedItem();
+    private void register() {
+        // Kullanıcı girişlerini al
+        String firstName = registerView.getFirstNameField().getText().trim();
+        String lastName = registerView.getLastNameField().getText().trim();
+        String username = registerView.getUsernameField().getText().trim();
+        String password = new String(registerView.getPasswordField().getPassword()).trim();
 
-        User newUser = new User(username, password, role);
+        // Boş alan kontrolü
+        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(registerView, "All fields are required!");
+            return;
+        }
+
+        // Parola uzunluk kontrolü
+        if (password.length() < 6) {
+            JOptionPane.showMessageDialog(registerView, "Password must be at least 6 characters long!");
+            return;
+        }
+
+        // Kullanıcı adı format kontrolü
+        if (!isValidUsername(username)) {
+            JOptionPane.showMessageDialog(registerView, "Username can only contain letters, numbers, and underscores.");
+            return;
+        }
+
+        // Yeni kullanıcı oluştur
+        User newUser = new User(0, username, hashPassword(password), firstName, lastName, 0.0); // 0 ID otomatik atanacak
         boolean success = userController.registerUser(newUser);
 
         if (success) {
-            JOptionPane.showMessageDialog(signupView, "Account created successfully!");
-            signupView.dispose();
+            JOptionPane.showMessageDialog(registerView, "Registration Successful!");
+            openLoginView();
         } else {
-            JOptionPane.showMessageDialog(signupView, "Failed to create account. Username may already exist.");
+            JOptionPane.showMessageDialog(registerView, "Registration Failed! Username may already exist.");
         }
+    }
+
+    private void openLoginView() {
+        LoginView loginView = new LoginView();
+        new LoginController(loginView, userController);
+        loginView.setVisible(true);
+        registerView.dispose();
+    }
+
+    // Kullanıcı adı format kontrolü
+    private boolean isValidUsername(String username) {
+        return Pattern.matches("^[a-zA-Z0-9_]+$", username);
+    }
+
+    // Parola hash fonksiyonu (örnek olarak basit bir şifreleme; üretim için güvenli bir yöntem kullanılmalı)
+    private String hashPassword(String password) {
+        // Bu örnek, hash yerine düz metin döndürüyor. BCrypt veya SHA-256 gibi bir hash kütüphanesi kullanmanız önerilir.
+        return password; // Değiştirin: BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }
