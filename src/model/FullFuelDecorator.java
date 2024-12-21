@@ -6,6 +6,11 @@ public class FullFuelDecorator extends CarDecorator {
     }
 
     @Override
+    public int getId() {
+        return 0;
+    }
+
+    @Override
     public String getModel() {
         return super.getModel() + " (with Full Tank Fuel)";
     }

@@ -8,22 +8,38 @@ import java.awt.*;
 public class RentedCarsView extends JFrame {
     private JTable rentedCarTable;
     private JButton backButton;
+    private JButton cancelButton;
+    private JButton returnButton; // Yeni Return Button
 
     public RentedCarsView(User currentUser) {
         setTitle("Rented Cars");
-        setSize(800, 400);
+        setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // Başlık
         JLabel label = new JLabel("Rented Cars for " + currentUser.getFirstName() + " " + currentUser.getLastName(), SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 20));
+        label.setFont(new Font("Arial", Font.BOLD, 24));
+        label.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         add(label, BorderLayout.NORTH);
 
-        rentedCarTable = new JTable(); // Table will be populated with data
-        add(new JScrollPane(rentedCarTable), BorderLayout.CENTER);
+        // Tablo
+        rentedCarTable = new JTable();
+        rentedCarTable.setRowHeight(30);
+        rentedCarTable.setFont(new Font("Arial", Font.PLAIN, 16));
+        JScrollPane scrollPane = new JScrollPane(rentedCarTable);
+        add(scrollPane, BorderLayout.CENTER);
 
+        // Düğmeler
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         backButton = new JButton("Back");
-        add(backButton, BorderLayout.SOUTH);
+        cancelButton = new JButton("Cancel Rental");
+        returnButton = new JButton("Return Car"); // Return düğmesi
+        buttonPanel.add(backButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(returnButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     public JTable getRentedCarTable() {
@@ -32,5 +48,13 @@ public class RentedCarsView extends JFrame {
 
     public JButton getBackButton() {
         return backButton;
+    }
+
+    public JButton getCancelButton() {
+        return cancelButton;
+    }
+
+    public JButton getReturnButton() {
+        return returnButton;
     }
 }

@@ -1,13 +1,21 @@
 package model;
 
 public class SUV implements Car {
+    private int id;
     private String model;
     private boolean available;
-    private final double basePrice = 100.0; // Örnek fiyat
+    private double basePrice;
 
-    public SUV(String model, boolean available) {
+    public SUV(int id, String model, boolean available, double basePrice) {
+        this.id = id;
         this.model = model;
         this.available = available;
+        this.basePrice = basePrice;
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override

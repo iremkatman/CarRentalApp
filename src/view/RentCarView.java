@@ -10,7 +10,7 @@ public class RentCarView extends JFrame {
     private JButton rentButton, backButton;
     private JComboBox<String> pricingModelComboBox;
     private JCheckBox fullFuelCheckBox, insuranceCheckBox;
-    private JLabel currentBalanceLabel;
+    private JLabel currentBalanceLabel, totalCostLabel;
 
     public RentCarView(User currentUser) {
         setTitle("Rent a Car");
@@ -31,8 +31,10 @@ public class RentCarView extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // Car Table
-        carTable = new JTable();
+        // Car Table with Base Price
+        String[] columnNames = {"Model", "Type", "Base Price"};
+        Object[][] data = {}; // Data will be populated by the controller
+        carTable = new JTable(data, columnNames);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
         // Right Panel with options
@@ -53,12 +55,17 @@ public class RentCarView extends JFrame {
         noteLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         noteLabel.setForeground(Color.BLUE);
 
+        totalCostLabel = new JLabel("Total Cost: $0.0", SwingConstants.LEFT);
+        totalCostLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
         rightPanel.add(pricingLabel);
         rightPanel.add(pricingModelComboBox);
         rightPanel.add(fullFuelCheckBox);
         rightPanel.add(insuranceCheckBox);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         rightPanel.add(noteLabel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        rightPanel.add(totalCostLabel);
 
         add(rightPanel, BorderLayout.EAST);
 
@@ -100,5 +107,9 @@ public class RentCarView extends JFrame {
 
     public JLabel getCurrentBalanceLabel() {
         return currentBalanceLabel;
+    }
+
+    public JLabel getTotalCostLabel() {
+        return totalCostLabel;
     }
 }

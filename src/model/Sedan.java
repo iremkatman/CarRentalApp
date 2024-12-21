@@ -1,16 +1,23 @@
 package model;
 
 public class Sedan implements Car {
+    private int id;
+
     private String model;
     private boolean available;
-    private final double basePrice = 100.0; // Örnek fiyat
+    private double basePrice;
 
-
-    public Sedan(String model, boolean available) {
+    public Sedan(int id,String model, boolean available, double basePrice) {
         this.model = model;
         this.available = available;
+        this.basePrice = basePrice;
+        this.id=id;
     }
 
+    @Override
+    public int getId() {
+        return id;
+    }
     @Override
     public String getModel() {
         return model;
@@ -33,6 +40,6 @@ public class Sedan implements Car {
 
     @Override
     public double getBasePrice() {
-        return 0;
+        return basePrice;
     }
 }

@@ -20,7 +20,7 @@ public class RegisterView extends JFrame {
         // Left side - Car Image
         JLabel carImageLabel = new JLabel();
         carImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon carImage = new ImageIcon("src/registerr.jpg");
+        ImageIcon carImage = new ImageIcon("src/resources/register.jpeg");
         Image scaledCarImage = carImage.getImage().getScaledInstance(400, 400, Image.SCALE_SMOOTH);
         carImageLabel.setIcon(new ImageIcon(scaledCarImage));
         add(carImageLabel, BorderLayout.WEST);

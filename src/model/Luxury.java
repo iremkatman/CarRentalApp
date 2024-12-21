@@ -1,15 +1,23 @@
 package model;
 
 public class Luxury implements Car {
+    private int id;
+
     private String model;
     private boolean available;
-    private final double basePrice = 200.0; // Lüks araçlar için fiyat
+    private double basePrice;
 
-    public Luxury(String model, boolean available) {
+    public Luxury(int id, String model, boolean available, double basePrice) {
         this.model = model;
         this.available = available;
+        this.basePrice = basePrice;
+        this.id=id;
     }
 
+    @Override
+    public int getId() {
+        return id;
+    }
     @Override
     public String getModel() {
         return model;

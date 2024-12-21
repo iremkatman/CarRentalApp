@@ -1,13 +1,22 @@
 package model;
 
 public class Sports implements Car {
+    private int id;
+
     private String model;
     private boolean available;
-    private final double basePrice = 150.0; // Örnek fiyat
+    private double basePrice;
 
-    public Sports(String model, boolean available) {
+    public Sports(int id, String model, boolean available, double basePrice) {
         this.model = model;
         this.available = available;
+        this.basePrice = basePrice;
+        this.id=id;
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override

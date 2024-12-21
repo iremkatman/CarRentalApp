@@ -1,15 +1,23 @@
 package model;
 
 public class Hatchback implements Car {
+    private int id;
+
     private String model;
     private boolean available;
-    private final double basePrice = 100.0; // Örnek fiyat
+    private double basePrice;
 
-    public Hatchback(String model, boolean available) {
+    public Hatchback(int id,String model, boolean available, double basePrice) {
         this.model = model;
         this.available = available;
+        this.basePrice = basePrice;
+        this.id=id;
     }
 
+    @Override
+    public int getId() {
+        return id;
+    }
     @Override
     public String getModel() {
         return model;
@@ -32,7 +40,6 @@ public class Hatchback implements Car {
 
     @Override
     public double getBasePrice() {
-        return 0;
+        return basePrice;
     }
 }
-
