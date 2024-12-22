@@ -1,27 +1,30 @@
 package model;
 
 public class FullFuelDecorator extends CarDecorator {
+    private static final double FULLFUEL_COST = 50.0; // Sabit full-fuel maliyeti
+
     public FullFuelDecorator(Car decoratedCar) {
         super(decoratedCar);
     }
 
     @Override
     public int getId() {
-        return 0;
+        return decoratedCar.getId();
     }
 
     @Override
     public String getModel() {
-        return super.getModel() + " (with Full Tank Fuel)";
+        return decoratedCar.getModel() + " (with FullFuel)";
     }
 
     @Override
     public double getBasePrice() {
-        return decoratedCar.getBasePrice() + 50.0; // Ekstra yakıt maliyeti
+        return decoratedCar.getBasePrice();
     }
 
     @Override
     public double getCost() {
-        return 50.0; // Yakıt için ekstra ücret
+        return FULLFUEL_COST; // Sabit full-fuel maliyeti
     }
+
 }

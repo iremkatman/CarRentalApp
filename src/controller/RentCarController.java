@@ -13,11 +13,11 @@ import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Date; // Tarih işlemleri için
-import javax.swing.SpinnerDateModel; // Tarih modelleme için
-import javax.swing.JSpinner; // Tarih seçimi için JSpinner bileşeni
-import java.text.SimpleDateFormat; // Tarih biçimlendirme için
+import javax.swing.SpinnerDateModel;
+import javax.swing.JSpinner;
+import java.text.SimpleDateFormat;
 
 public class RentCarController {
     private RentCarView rentCarView;
@@ -27,7 +27,7 @@ public class RentCarController {
     private Connection connection = SingletonConnection.getInstance();
     private int selectedDuration;
     private String selectedPricingModel;
-    LocalDateTime startDateTime;
+    private LocalDateTime startDateTime;
 
     public RentCarController(RentCarView rentCarView, User currentUser, WelcomeView welcomeView) {
         this.rentCarView = rentCarView;
@@ -39,6 +39,8 @@ public class RentCarController {
         rentCarView.getPricingModelComboBox().addActionListener(e -> handlePricingModelSelection());
         rentCarView.getRentButton().addActionListener(e -> rentCar());
         rentCarView.getBackButton().addActionListener(e -> goBackToWelcome());
+        rentCarView.getFullFuelCheckBox().addActionListener(e -> updateEstimatedCost());
+        rentCarView.getInsuranceCheckBox().addActionListener(e -> updateEstimatedCost());
     }
 
     private List<Car> fetchAvailableCars() {
@@ -89,10 +91,9 @@ public class RentCarController {
                 return;
             }
 
-            // JSpinner ile tarih seçimi
             SpinnerDateModel dateModel = new SpinnerDateModel();
-            dateModel.setStart(new Date()); // Minimum tarih olarak bugünü ayarla
-            dateModel.setValue(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)); // Varsayılan tarih yarın
+            dateModel.setStart(new Date());
+            dateModel.setValue(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
 
             JSpinner dateSpinner = new JSpinner(dateModel);
             JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd");
@@ -105,14 +106,14 @@ public class RentCarController {
             int result = JOptionPane.showConfirmDialog(rentCarView, panel, "Select Start Date", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 Date selectedStartDate = (Date) dateSpinner.getValue();
-                 startDateTime = LocalDateTime.parse(new SimpleDateFormat("yyyy-MM-dd").format(selectedStartDate) + "T12:00:00");
+                startDateTime = LocalDateTime.parse(new SimpleDateFormat("yyyy-MM-dd").format(selectedStartDate) + "T12:00:00");
 
                 String durationStr = JOptionPane.showInputDialog(rentCarView, "Enter rental duration:");
                 if (durationStr != null) {
                     try {
                         selectedDuration = Integer.parseInt(durationStr);
                         if (selectedDuration > 0) {
-                            updateEstimatedCost(selectedPricingModel, selectedDuration, startDateTime);
+                            updateEstimatedCost();
                         } else {
                             JOptionPane.showMessageDialog(rentCarView, "Duration must be positive!");
                         }
@@ -124,7 +125,7 @@ public class RentCarController {
         }
     }
 
-    private void updateEstimatedCost(String pricingModel, int duration, LocalDateTime startDateTime) {
+    private void updateEstimatedCost() {
         int selectedRow = rentCarView.getCarTable().getSelectedRow();
         if (selectedRow == -1) {
             rentCarView.getTotalCostLabel().setText("Total Cost: $0.0");
@@ -132,48 +133,32 @@ public class RentCarController {
         }
 
         Car selectedCar = carList.get(selectedRow);
-        PricingStrategy pricingStrategy;
+        PricingStrategy pricingStrategy = getPricingStrategy(selectedPricingModel);
 
-        switch (pricingModel) {
-            case "Hourly - No Discount":
-                pricingStrategy = new HourlyPricing();
-                break;
-            case "Daily - 10% Discount":
-                pricingStrategy = new DailyPricing();
-                break;
-            case "Weekly - 25% Discount":
-                pricingStrategy = new WeeklyPricing();
-                break;
-            default:
-                rentCarView.getTotalCostLabel().setText("Invalid pricing model.");
-                return;
+        Car decoratedCar = selectedCar;
+
+        if (rentCarView.getFullFuelCheckBox().isSelected()) {
+            decoratedCar = new FullFuelDecorator(decoratedCar);
+        }
+        if (rentCarView.getInsuranceCheckBox().isSelected()) {
+            decoratedCar = new InsuranceDecorator(decoratedCar);
         }
 
-        double estimatedCost = pricingStrategy.calculatePrice(selectedCar.getBasePrice(), duration);
+        double estimatedCost = calculateTotalCost(decoratedCar, pricingStrategy, selectedDuration);
+        rentCarView.getTotalCostLabel().setText(String.format("Estimated Cost: $%.2f", estimatedCost));
+    }
 
-        if (rentCarView.getFullFuelCheckBox().isSelected()) estimatedCost += 50;
-        if (rentCarView.getInsuranceCheckBox().isSelected()) estimatedCost += 30;
-
-        // Return date hesaplama
-        LocalDateTime returnDate;
+    private PricingStrategy getPricingStrategy(String pricingModel) {
         switch (pricingModel) {
             case "Hourly - No Discount":
-                returnDate = startDateTime.plusHours(duration);
-                break;
+                return new HourlyPricing();
             case "Daily - 10% Discount":
-                returnDate = startDateTime.plusDays(duration);
-                break;
+                return new DailyPricing();
             case "Weekly - 25% Discount":
-                returnDate = startDateTime.plusWeeks(duration);
-                break;
+                return new WeeklyPricing();
             default:
-                returnDate = startDateTime;
+                throw new IllegalArgumentException("Invalid pricing model.");
         }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedReturnDate = returnDate.format(formatter);
-
-        rentCarView.getTotalCostLabel().setText(String.format("Estimated Cost: $%.2f\nReturn Date: %s", estimatedCost, formattedReturnDate));
     }
 
     private void rentCar() {
@@ -189,44 +174,52 @@ public class RentCarController {
             return;
         }
 
-        if (selectedPricingModel == null || selectedDuration <= 0) {
-            JOptionPane.showMessageDialog(rentCarView, "Please select a pricing model and duration first.");
+        if (selectedPricingModel == null) {
+            JOptionPane.showMessageDialog(rentCarView, "Please select a pricing model.");
+            return;
+        }
+        if (selectedDuration <= 0) {
+            JOptionPane.showMessageDialog(rentCarView, "Rental duration must be greater than 0.");
             return;
         }
 
-        double totalCost = calculateTotalCost(selectedCar, selectedPricingModel, selectedDuration);
+        Car decoratedCar = selectedCar;
+
+        if (rentCarView.getFullFuelCheckBox().isSelected()) {
+            decoratedCar = new FullFuelDecorator(decoratedCar);
+        }
+        if (rentCarView.getInsuranceCheckBox().isSelected()) {
+            decoratedCar = new InsuranceDecorator(decoratedCar);
+        }
+
+        PricingStrategy pricingStrategy = getPricingStrategy(selectedPricingModel);
+
+        double totalCost = calculateTotalCost(decoratedCar, pricingStrategy, selectedDuration);
+
         if (currentUser.getBudget() < totalCost) {
-            JOptionPane.showMessageDialog(rentCarView, "Insufficient funds. Please deposit more money.");
+            JOptionPane.showMessageDialog(rentCarView,
+                    String.format("Insufficient funds. You need $%.2f more.", totalCost - currentUser.getBudget()));
             return;
         }
 
-        processReservation(selectedCar, selectedPricingModel, selectedDuration, totalCost);
+        processReservation(decoratedCar, selectedPricingModel, selectedDuration, totalCost);
         refreshTableAndBudget();
     }
 
-    private double calculateTotalCost(Car selectedCar, String pricingModel, int duration) {
-        PricingStrategy pricingStrategy;
+    private double calculateTotalCost(Car decoratedCar, PricingStrategy pricingStrategy, int duration) {
+        double baseCost = pricingStrategy.calculatePrice(decoratedCar.getBasePrice(), duration);
+        double decoratorCost = 0;
 
-        switch (pricingModel) {
-            case "Hourly - No Discount":
-                pricingStrategy = new HourlyPricing();
-                break;
-            case "Daily - 10% Discount":
-                pricingStrategy = new DailyPricing();
-                break;
-            case "Weekly - 25% Discount":
-                pricingStrategy = new WeeklyPricing();
-                break;
-            default:
-                return 0.0;
+        if (decoratedCar instanceof FullFuelDecorator) {
+            decoratorCost += ((FullFuelDecorator) decoratedCar).getCost();
+        }
+        if (decoratedCar instanceof InsuranceDecorator) {
+            decoratorCost += ((InsuranceDecorator) decoratedCar).getCost()*duration;
         }
 
-        double totalCost = pricingStrategy.calculatePrice(selectedCar.getBasePrice(), duration);
-        if (rentCarView.getFullFuelCheckBox().isSelected()) totalCost += 50;
-        if (rentCarView.getInsuranceCheckBox().isSelected()) totalCost += 30;
-
-        return totalCost;
+        return baseCost + decoratorCost;
     }
+
 
     private void processReservation(Car selectedCar, String pricingModel, int duration, double totalCost) {
         LocalDateTime now = startDateTime;

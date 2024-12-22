@@ -43,7 +43,7 @@ public class RentCarView extends JFrame {
         rightPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         fullFuelCheckBox = new JCheckBox("Full Tank Fuel (+$50)");
-        insuranceCheckBox = new JCheckBox("Temporary Insurance (+$30)");
+        insuranceCheckBox = new JCheckBox("Daily Temporary Insurance (+$30)");
         pricingModelComboBox = new JComboBox<>(new String[]{
                 "Hourly - No Discount",
                 "Daily - 10% Discount",

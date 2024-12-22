@@ -1,7 +1,7 @@
 package model;
 
 public class InsuranceDecorator extends CarDecorator {
-    private static final double INSURANCE_COST = 30.0; // Sigorta maliyeti sabit bir değer
+    private static final double INSURANCE_COST_PER_DAY = 30.0; // Günlük sigorta maliyeti
 
     public InsuranceDecorator(Car decoratedCar) {
         super(decoratedCar);
@@ -9,25 +9,22 @@ public class InsuranceDecorator extends CarDecorator {
 
     @Override
     public int getId() {
-        // Orijinal aracın ID'sini döndür
         return decoratedCar.getId();
     }
 
     @Override
     public String getModel() {
-        // Model bilgisine sigorta detayını ekle
         return decoratedCar.getModel() + " (with Temporary Insurance)";
     }
 
     @Override
     public double getBasePrice() {
-        // Sigorta maliyetini temel fiyata ekle
-        return decoratedCar.getBasePrice() + INSURANCE_COST;
+        return decoratedCar.getBasePrice();
     }
 
     @Override
     public double getCost() {
-        // Sigorta maliyetini döndür
-        return INSURANCE_COST;
+        return INSURANCE_COST_PER_DAY ; // Sigorta maliyeti, gün sayısına göre
     }
+
 }
