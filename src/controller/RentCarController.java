@@ -26,8 +26,9 @@ public class RentCarController {
     private List<Car> carList;
     private Connection connection = SingletonConnection.getInstance();
     private int selectedDuration;
-    private String selectedPricingModel;
     private LocalDateTime startDateTime;
+    private String selectedPricingModel = "Hourly - No Discount"; // Varsayılan değer
+
 
     public RentCarController(RentCarView rentCarView, User currentUser, WelcomeView welcomeView) {
         this.rentCarView = rentCarView;
@@ -149,6 +150,9 @@ public class RentCarController {
     }
 
     private PricingStrategy getPricingStrategy(String pricingModel) {
+        if (pricingModel == null || pricingModel.isEmpty()) {
+            throw new IllegalArgumentException("No pricing model selected.");
+        }
         switch (pricingModel) {
             case "Hourly - No Discount":
                 return new HourlyPricing();

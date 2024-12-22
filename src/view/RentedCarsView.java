@@ -9,7 +9,8 @@ public class RentedCarsView extends JFrame {
     private JTable rentedCarTable;
     private JButton backButton;
     private JButton cancelButton;
-    private JButton returnButton; // Yeni Return Button
+    private JButton returnButton;
+    private JButton undoButton; // Yeni Undo Button
 
     public RentedCarsView(User currentUser) {
         setTitle("Rented Cars");
@@ -34,10 +35,12 @@ public class RentedCarsView extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         backButton = new JButton("Back");
         cancelButton = new JButton("Cancel Rental");
-        returnButton = new JButton("Return Car"); // Return düğmesi
+        returnButton = new JButton("Return Car");
+        undoButton = new JButton("Undo"); // Undo düğmesini ekleyin
         buttonPanel.add(backButton);
         buttonPanel.add(cancelButton);
         buttonPanel.add(returnButton);
+        buttonPanel.add(undoButton); // Undo düğmesini ekleyin
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -56,5 +59,9 @@ public class RentedCarsView extends JFrame {
 
     public JButton getReturnButton() {
         return returnButton;
+    }
+
+    public JButton getUndoButton() {
+        return undoButton;
     }
 }

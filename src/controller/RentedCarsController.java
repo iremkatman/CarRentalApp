@@ -1,5 +1,8 @@
 package controller;
 
+import command.CancelRentalCommand;
+import command.CommandInvoker;
+import command.ReturnCarCommand;
 import database.SingletonConnection;
 import model.User;
 import view.RentedCarsView;
@@ -10,25 +13,27 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class RentedCarsController {
     private RentedCarsView rentedCarsView;
     private User currentUser;
     private WelcomeView welcomeView;
     private Connection connection;
+    private CommandInvoker commandInvoker;
 
     public RentedCarsController(RentedCarsView rentedCarsView, User currentUser, WelcomeView welcomeView) {
         this.rentedCarsView = rentedCarsView;
         this.currentUser = currentUser;
         this.welcomeView = welcomeView;
         this.connection = SingletonConnection.getInstance();
+        this.commandInvoker = new CommandInvoker();
 
         populateRentedCars();
         rentedCarsView.getBackButton().addActionListener(e -> goBackToWelcome());
         rentedCarsView.getCancelButton().addActionListener(e -> cancelSelectedRental());
         rentedCarsView.getReturnButton().addActionListener(e -> returnSelectedCar());
+        rentedCarsView.getUndoButton().addActionListener(e -> undoLastAction());
+
     }
 
     private void populateRentedCars() {
@@ -71,6 +76,12 @@ public class RentedCarsController {
             e.printStackTrace();
         }
     }
+    private void undoLastAction() {
+        commandInvoker.undoLastCommand(); // Undo işlemini tetikleyin
+        populateRentedCars(); // Tabloyu güncelleyin
+        JOptionPane.showMessageDialog(rentedCarsView, "Last action undone.");
+    }
+
 
     private void cancelSelectedRental() {
         int selectedRow = rentedCarsView.getRentedCarTable().getSelectedRow();
@@ -81,33 +92,11 @@ public class RentedCarsController {
 
         int reservationId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 0);
         int carId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 1);
-        String startDateStr = (String) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 3);
 
-        // Eğer kiralama başlamışsa iptal edilemez
-        LocalDate startDate = LocalDate.parse(startDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        if (!LocalDate.now().isBefore(startDate)) {
-            JOptionPane.showMessageDialog(rentedCarsView, "The rental has already started and cannot be cancelled.");
-            return;
-        }
+        CancelRentalCommand cancelRentalCommand = new CancelRentalCommand(reservationId, carId);
+        commandInvoker.executeCommand(cancelRentalCommand);
 
-        try {
-            String deleteQuery = "DELETE FROM reservations WHERE id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
-                stmt.setInt(1, reservationId);
-                stmt.executeUpdate();
-            }
-
-            String updateCarQuery = "UPDATE cars SET availability = TRUE WHERE id = ?";
-            try (PreparedStatement carStmt = connection.prepareStatement(updateCarQuery)) {
-                carStmt.setInt(1, carId);
-                carStmt.executeUpdate();
-            }
-
-            JOptionPane.showMessageDialog(rentedCarsView, "Rental cancelled successfully.");
-            populateRentedCars();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        populateRentedCars();
     }
 
     private void returnSelectedCar() {
@@ -119,32 +108,11 @@ public class RentedCarsController {
 
         int reservationId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 0);
         int carId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 1);
-        String endDateStr = (String) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 4);
 
-        LocalDate endDate = LocalDate.parse(endDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        if (LocalDate.now().isBefore(endDate)) {
-            JOptionPane.showMessageDialog(rentedCarsView, "The car cannot be returned before the end date.");
-            return;
-        }
+        ReturnCarCommand returnCarCommand = new ReturnCarCommand(reservationId, carId);
+        commandInvoker.executeCommand(returnCarCommand);
 
-        try {
-            String deleteQuery = "DELETE FROM reservations WHERE id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
-                stmt.setInt(1, reservationId);
-                stmt.executeUpdate();
-            }
-
-            String updateCarQuery = "UPDATE cars SET availability = TRUE WHERE id = ?";
-            try (PreparedStatement carStmt = connection.prepareStatement(updateCarQuery)) {
-                carStmt.setInt(1, carId);
-                carStmt.executeUpdate();
-            }
-
-            JOptionPane.showMessageDialog(rentedCarsView, "Car returned successfully.");
-            populateRentedCars();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        populateRentedCars();
     }
 
     private void goBackToWelcome() {
