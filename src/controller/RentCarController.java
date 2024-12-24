@@ -61,6 +61,7 @@ public class RentCarController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return cars;
     }
 
@@ -73,6 +74,10 @@ public class RentCarController {
         }
 
         rentCarView.getCarTable().setModel(model);
+        rentCarView.getCarTable().getColumnModel().getColumn(0).setMinWidth(0);
+        rentCarView.getCarTable().getColumnModel().getColumn(0).setMaxWidth(0);
+        rentCarView.getCarTable().getColumnModel().getColumn(0).setPreferredWidth(0);
+
         rentCarView.getCurrentBalanceLabel().setText(String.format("Current Balance: $%.2f", currentUser.getBudget()));
     }
 
