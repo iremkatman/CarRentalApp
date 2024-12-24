@@ -31,7 +31,7 @@ public class LoginController {
         User user = userController.login(username, password);
         if (user != null) {
             JOptionPane.showMessageDialog(loginView, "Login Successful! Welcome, " + user.getFirstName());
-            WelcomeView welcomeView = new WelcomeView(user.getFirstName() + " " + user.getLastName());
+            WelcomeView welcomeView = new WelcomeView(user);
             new WelcomeController(welcomeView, user);
             welcomeView.setVisible(true);
             loginView.dispose();

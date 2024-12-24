@@ -58,6 +58,7 @@ public class DepositMoneyController {
                 return;
             }
 
+            // Veritabanı işlemleri
             try {
                 String updateBudgetQuery = "UPDATE users SET budget = budget + ? WHERE id = ?";
                 PreparedStatement updateStmt = connection.prepareStatement(updateBudgetQuery);
@@ -66,14 +67,11 @@ public class DepositMoneyController {
                 int rowsAffected = updateStmt.executeUpdate();
 
                 if (rowsAffected > 0) {
-                    // Kullanıcı bütçesini güncelle
-                    currentUser.setBudget(currentUser.getBudget() + amount);
-
-                    // Arayüzü güncelle
-                    depositMoneyView.getCurrentBalanceLabel().setText("Current Balance: $" + currentUser.getBudget());
+                    // Model güncellemesi
+                    currentUser.setBudget(currentUser.getBudget() + amount); // Observer'ları otomatik bilgilendirir
                     JOptionPane.showMessageDialog(depositMoneyView, "Deposit successful!");
                 } else {
-                    JOptionPane.showMessageDialog(depositMoneyView, "Failed to update user budget.");
+                    JOptionPane.showMessageDialog(depositMoneyView, "Failed to update user budget in the database.");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -83,6 +81,7 @@ public class DepositMoneyController {
             JOptionPane.showMessageDialog(depositMoneyView, "Invalid amount entered!");
         }
     }
+
 
     private void goBackToWelcome() {
         // WelcomeView'deki bütçeyi güncelle

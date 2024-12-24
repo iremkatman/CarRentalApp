@@ -13,6 +13,9 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class RentedCarsController {
     private RentedCarsView rentedCarsView;
@@ -36,7 +39,7 @@ public class RentedCarsController {
 
     }
 
-    private void populateRentedCars() {
+    boolean populateRentedCars() {
         String query = """
                 SELECT 
                     r.id AS reservation_id, 
@@ -68,19 +71,31 @@ public class RentedCarsController {
             }
 
             rentedCarsView.getRentedCarTable().setModel(model);
-
+            rentedCarsView.getRentedCarTable().getColumnModel().getColumn(0).setMinWidth(0);
+            rentedCarsView.getRentedCarTable().getColumnModel().getColumn(0).setMaxWidth(0);
+            rentedCarsView.getRentedCarTable().getColumnModel().getColumn(1).setMinWidth(0);
+            rentedCarsView.getRentedCarTable().getColumnModel().getColumn(1).setMaxWidth(0);
             if (model.getRowCount() == 0) {
-                JOptionPane.showMessageDialog(rentedCarsView, "No rented cars found.");
+                return false;
+
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
+
         }
     }
     private void undoLastAction() {
-        commandInvoker.undoLastCommand(); // Undo işlemini tetikleyin
-        populateRentedCars(); // Tabloyu güncelleyin
-        JOptionPane.showMessageDialog(rentedCarsView, "Last action undone.");
+        if (commandInvoker.canUndo()) {
+            commandInvoker.undoLastCommand(); // Undo işlemini tetikleyin
+            populateRentedCars(); // Tabloyu güncelleyin
+            JOptionPane.showMessageDialog(rentedCarsView, "Last action undone.");
+        } else {
+            JOptionPane.showMessageDialog(rentedCarsView, "Nothing to undo.");
+        }
     }
+
 
 
     private void cancelSelectedRental() {
@@ -106,13 +121,44 @@ public class RentedCarsController {
             return;
         }
 
-        int reservationId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 0);
-        int carId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 1);
+        // Tablo verilerini al
+        String startDateStr = (String) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 3);
+        String endDateStr = (String) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 4);
 
-        ReturnCarCommand returnCarCommand = new ReturnCarCommand(reservationId, carId);
-        commandInvoker.executeCommand(returnCarCommand);
+        // Tarih formatını tanımla
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        populateRentedCars();
+        try {
+            // Tarihleri parse et
+            LocalDate startDate = LocalDateTime.parse(startDateStr, formatter).toLocalDate();
+            LocalDate endDate = LocalDateTime.parse(endDateStr, formatter).toLocalDate();
+
+            // Kontroller
+            if (LocalDate.now().isBefore(startDate)) {
+                JOptionPane.showMessageDialog(rentedCarsView,
+                        "You cannot return the car before the start date, but you can cancel the reservation.");
+                return; // İşlem sonlanır
+            }
+
+            if (LocalDate.now().isBefore(endDate)) {
+                JOptionPane.showMessageDialog(rentedCarsView, "You cannot return the car before the end date.");
+                return; // İşlem sonlanır
+            }
+
+            int reservationId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 0);
+            int carId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 1);
+
+            // Return işlemini başlat
+            ReturnCarCommand returnCarCommand = new ReturnCarCommand(reservationId, carId);
+            commandInvoker.executeCommand(returnCarCommand);
+
+            JOptionPane.showMessageDialog(rentedCarsView, "Car successfully returned.");
+            populateRentedCars();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rentedCarsView, "Error processing dates. Please contact support.");
+            e.printStackTrace();
+        }
     }
 
     private void goBackToWelcome() {
@@ -120,3 +166,5 @@ public class RentedCarsController {
         rentedCarsView.dispose();
     }
 }
+
+

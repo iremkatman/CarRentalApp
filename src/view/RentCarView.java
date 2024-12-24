@@ -20,7 +20,7 @@ public class RentCarView extends JFrame {
 
         // Top Panel with Balance
         JPanel topPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("Available Cars", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Rent A Car", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         topPanel.add(titleLabel, BorderLayout.NORTH);
 

@@ -1,24 +1,33 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
+import model.Observer;
+import model.User;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class WelcomeView extends JFrame {
+public class WelcomeView extends JFrame implements Observer {
+    private JLabel budgetLabel;
     private JButton rentCarButton, viewCarsButton, rentedCarsButton, depositMoneyButton, exitButton;
 
-    public WelcomeView(String fullName) {
+    public WelcomeView(User currentUser) {
         setTitle("Welcome");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // Observer olarak kendini ekle
+        currentUser.addObserver(this);
+
+        // Bütçe Label
+        budgetLabel = new JLabel("Current Balance: $" + currentUser.getBudget(), SwingConstants.CENTER);
+        budgetLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        add(budgetLabel, BorderLayout.NORTH);
+
         // Welcome Label
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
-        JLabel welcomeLabel = new JLabel("Welcome, " + fullName);
+        JLabel welcomeLabel = new JLabel("Welcome, " + currentUser.getFirstName() + " " + currentUser.getLastName());
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         topPanel.add(welcomeLabel, BorderLayout.NORTH);
@@ -78,6 +87,12 @@ public class WelcomeView extends JFrame {
         setVisible(true);
     }
 
+    // Observer'dan gelen güncellemeleri işlemek için metot
+    @Override
+    public void update(double newBudget) {
+        budgetLabel.setText("Current Balance: $" + newBudget);
+    }
+
     public JButton getRentCarButton() {
         return rentCarButton;
     }
@@ -97,6 +112,4 @@ public class WelcomeView extends JFrame {
     public JButton getExitButton() {
         return exitButton;
     }
-
-
 }

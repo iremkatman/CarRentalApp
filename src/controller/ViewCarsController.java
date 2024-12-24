@@ -44,6 +44,8 @@ public class ViewCarsController {
             e.printStackTrace();
         }
         viewCarsView.getCarTable().setModel(model);
+        viewCarsView.getCarTable().getColumnModel().getColumn(0).setMinWidth(0);
+        viewCarsView.getCarTable().getColumnModel().getColumn(0).setMaxWidth(0);
     }
 
     private void setupFilters() {
@@ -84,6 +86,11 @@ public class ViewCarsController {
                 ex.printStackTrace();
             }
             viewCarsView.getCarTable().setModel(model);
+            viewCarsView.getCarImageLabel().setIcon(null);
+            viewCarsView.getCarTable().getColumnModel().getColumn(0).setMinWidth(0);
+            viewCarsView.getCarTable().getColumnModel().getColumn(0).setMaxWidth(0);
+
+
         });
     }
 
@@ -109,7 +116,7 @@ public class ViewCarsController {
         ImageIcon carImage = new ImageIcon(imagePath);
         if (carImage.getIconWidth() == -1) {
             viewCarsView.getCarImageLabel().setIcon(null);
-            viewCarsView.getCarImageLabel().setText("Image not found");
+            viewCarsView.getCarImageLabel().setText("");
         } else {
             viewCarsView.getCarImageLabel().setIcon(carImage);
             viewCarsView.getCarImageLabel().setText("");

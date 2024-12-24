@@ -1,11 +1,12 @@
 package view;
 
+import model.Observer;
 import model.User;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class DepositMoneyView extends JFrame {
+public class DepositMoneyView extends JFrame implements Observer {
     private JTextField amountField;
     private JButton depositButton;
     private JButton backButton;
@@ -17,7 +18,8 @@ public class DepositMoneyView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(4, 1));
 
-        // Display current balance
+        currentUser.addObserver(this);
+
         currentBalanceLabel = new JLabel("Current Balance: $" + currentUser.getBudget(), SwingConstants.CENTER);
         add(currentBalanceLabel);
 
@@ -33,7 +35,10 @@ public class DepositMoneyView extends JFrame {
 
         add(buttonPanel);
     }
-
+    @Override
+    public void update(double newBudget) {
+        currentBalanceLabel.setText("Current Balance: $" + newBudget);
+    }
     public JTextField getAmountField() {
         return amountField;
     }

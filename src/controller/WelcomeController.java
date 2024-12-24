@@ -3,6 +3,8 @@ package controller;
 import model.User;
 import view.*;
 
+import javax.swing.*;
+
 public class WelcomeController {
     private WelcomeView welcomeView;
     private User currentUser;
@@ -34,9 +36,16 @@ public class WelcomeController {
 
     private void openRentedCarsView() {
         RentedCarsView rentedCarsView = new RentedCarsView(currentUser);
-        new RentedCarsController(rentedCarsView, currentUser, welcomeView);
+        RentedCarsController rentedCarsController = new RentedCarsController(rentedCarsView, currentUser, welcomeView);
+
+        // Kiralanmış araç yoksa, uyarı göster ve pencereyi açma
+        if (!rentedCarsController.populateRentedCars()) {
+            JOptionPane.showMessageDialog(welcomeView, "No rented cars found.");
+            return;
+        }
+
         rentedCarsView.setVisible(true);
-        welcomeView.setVisible(false); // Hide the current view instead of disposing it
+        welcomeView.setVisible(false); // Hide the WelcomeView
     }
 
     private void openDepositMoneyView() {
