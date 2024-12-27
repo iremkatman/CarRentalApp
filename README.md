@@ -75,7 +75,7 @@ This project implements multiple design patterns to improve its structure and ma
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/car-rental-system.git
+   git clone https://github.com/iremkatman/car-rental-system.git
    ```
 
 2. Set up the database:
