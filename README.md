@@ -80,7 +80,6 @@ This project implements multiple design patterns to improve its structure and ma
 
 2. Set up the database:
    - Import the provided SQL schema to your MySQL database.
-   - Update database credentials in `SingletonConnection`.
 
 3. Build and run the project:
    - Open the project in your preferred IDE.
