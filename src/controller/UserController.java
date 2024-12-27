@@ -14,13 +14,12 @@ public class UserController {
         connection = SingletonConnection.getInstance();
     }
 
-    // Register a new user
     public boolean registerUser(User user) {
         try {
             String query = "INSERT INTO users (username, password, first_name, last_name, budget) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword()); // Ideally, hash this password
+            stmt.setString(2, user.getPassword());
             stmt.setString(3, user.getFirstName());
             stmt.setString(4, user.getLastName());
             stmt.setDouble(5, user.getBudget());
@@ -32,18 +31,17 @@ public class UserController {
         }
     }
 
-    // Login a user
     public User login(String username, String password) {
         try {
             String query = "SELECT * FROM users WHERE username = ? AND password = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, username);
-            stmt.setString(2, password); // Compare plain text (not secure, hash ideally)
+            stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 return new User(
-                        rs.getInt("id"), // Kullanıcı ID'si veritabanından çekiliyor
+                        rs.getInt("id"),
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("first_name"),
@@ -54,6 +52,6 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null; // Login failed
+        return null;
     }
 }

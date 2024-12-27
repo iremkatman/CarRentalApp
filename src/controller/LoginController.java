@@ -29,17 +29,15 @@ public class LoginController {
             return;
         }
 
-        // Admin giriş kontrolü
         if (username.equals("admin") && password.equals("admin123")) {
             JOptionPane.showMessageDialog(loginView, "Login Successful! Welcome, Admin.");
-            AdminView adminView = new AdminView(); // AdminView, admin için GUI'yi temsil eder
-            new AdminController(adminView); // AdminController, admin işlemlerini yönetir
+            AdminView adminView = new AdminView();
+            new AdminController(adminView);
             adminView.setVisible(true);
             loginView.dispose();
             return;
         }
 
-        // Kullanıcı giriş kontrolü
         User user = userController.login(username, password);
         if (user != null) {
             JOptionPane.showMessageDialog(loginView, "Login Successful! Welcome, " + user.getFirstName());

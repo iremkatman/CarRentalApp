@@ -11,7 +11,7 @@ public class User implements Subject{
     private String lastName;
     private double budget;
 
-    private List<Observer> observers = new ArrayList<>(); // Observer'ları takip edecek liste
+    private List<Observer> observers = new ArrayList<>();
 
     public User(int id, String username, String password, String firstName, String lastName, double budget) {
         this.id = id;
@@ -22,7 +22,6 @@ public class User implements Subject{
         this.budget = budget;
     }
 
-    // Observer işlemleri
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
@@ -36,8 +35,6 @@ public class User implements Subject{
             observer.update(budget);
         }
     }
-
-    // Bütçeyi güncelle ve observer'lara bildir
     public void setBudget(double budget) {
         this.budget = budget;
         notifyObservers();
@@ -47,7 +44,6 @@ public class User implements Subject{
         return budget;
     }
 
-    // Getter ve Setter
     public int getId() {
         return id;
     }

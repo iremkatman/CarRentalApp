@@ -14,8 +14,8 @@ public class LoginView extends JFrame {
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        // Left side - Car Image
         JLabel carImageLabel = new JLabel();
         carImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         ImageIcon carImage = new ImageIcon("src/resources/login.jpeg");
@@ -23,7 +23,6 @@ public class LoginView extends JFrame {
         carImageLabel.setIcon(new ImageIcon(scaledCarImage));
         add(carImageLabel, BorderLayout.WEST);
 
-        // Right side - Login form
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(new GridBagLayout());
         loginPanel.setBackground(Color.WHITE);

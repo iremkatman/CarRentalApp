@@ -1,7 +1,7 @@
 package model;
 
 public abstract class CarDecorator implements Car {
-    protected Car decoratedCar; // Orijinal Car nesnesi
+    protected Car decoratedCar;
 
     public CarDecorator(Car decoratedCar) {
         this.decoratedCar = decoratedCar;

@@ -1,7 +1,7 @@
 package model;
 
 public class InsuranceDecorator extends CarDecorator {
-    private static final double INSURANCE_COST_PER_DAY = 30.0; // Günlük sigorta maliyeti
+    private static final double INSURANCE_COST_PER_DAY = 30.0;
 
     public InsuranceDecorator(Car decoratedCar) {
         super(decoratedCar);
@@ -24,7 +24,7 @@ public class InsuranceDecorator extends CarDecorator {
 
     @Override
     public double getCost(int duration) {
-        return INSURANCE_COST_PER_DAY * duration; // Sigorta maliyeti, gün sayısına göre
+        return INSURANCE_COST_PER_DAY * duration;
     }
 }
 

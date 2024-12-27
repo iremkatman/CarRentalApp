@@ -16,8 +16,8 @@ public class RegisterView extends JFrame {
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        // Left side - Car Image
         JLabel carImageLabel = new JLabel();
         carImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         ImageIcon carImage = new ImageIcon("src/resources/register.jpeg");
@@ -25,7 +25,6 @@ public class RegisterView extends JFrame {
         carImageLabel.setIcon(new ImageIcon(scaledCarImage));
         add(carImageLabel, BorderLayout.WEST);
 
-        // Right side - Register form
         JPanel registerPanel = new JPanel();
         registerPanel.setLayout(new GridBagLayout());
         registerPanel.setBackground(Color.WHITE);
@@ -95,7 +94,6 @@ public class RegisterView extends JFrame {
         gbc.gridwidth = 2;
         registerPanel.add(registerButton, gbc);
 
-        // Add "Go to Login" section
         JLabel signedInLabel = new JLabel("If you are already signed in, you can go to Login.");
         signedInLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         signedInLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -114,7 +112,6 @@ public class RegisterView extends JFrame {
 
         add(registerPanel, BorderLayout.CENTER);
 
-        // Set visible
         setVisible(true);
     }
 

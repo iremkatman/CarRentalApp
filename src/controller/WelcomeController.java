@@ -24,35 +24,34 @@ public class WelcomeController {
         RentCarView rentCarView = new RentCarView(currentUser);
         new RentCarController(rentCarView, currentUser, welcomeView);
         rentCarView.setVisible(true);
-        welcomeView.setVisible(false); // Hide the current view instead of disposing it
+        welcomeView.setVisible(false);
     }
 
     private void openViewCarsView() {
         ViewCarsView viewCarsView = new ViewCarsView();
         new ViewCarsController(viewCarsView, welcomeView);
         viewCarsView.setVisible(true);
-        welcomeView.setVisible(false); // Hide the current view instead of disposing it
+        welcomeView.setVisible(false);
     }
 
     private void openRentedCarsView() {
         RentedCarsView rentedCarsView = new RentedCarsView(currentUser);
         RentedCarsController rentedCarsController = new RentedCarsController(rentedCarsView, currentUser, welcomeView);
 
-        // Kiralanmış araç yoksa, uyarı göster ve pencereyi açma
         if (!rentedCarsController.populateRentedCars()) {
             JOptionPane.showMessageDialog(welcomeView, "No rented cars found.");
             return;
         }
 
         rentedCarsView.setVisible(true);
-        welcomeView.setVisible(false); // Hide the WelcomeView
+        welcomeView.setVisible(false);
     }
 
     private void openDepositMoneyView() {
         DepositMoneyView depositMoneyView = new DepositMoneyView(currentUser);
-        new DepositMoneyController(depositMoneyView, currentUser, welcomeView); // Pass the WelcomeView
+        new DepositMoneyController(depositMoneyView, currentUser, welcomeView);
         depositMoneyView.setVisible(true);
-        welcomeView.setVisible(false); // Hide the WelcomeView
+        welcomeView.setVisible(false);
     }
 
     private void exitToLogin() {

@@ -18,10 +18,9 @@ public class CommandInvoker {
     public void undoLastCommand() {
         if (!commandHistory.isEmpty()) {
             Command lastCommand = commandHistory.pop();
-            lastCommand.undo(); // Son komutu geri al
+            lastCommand.undo();
         } else {
-            JOptionPane.showMessageDialog(null, "Nothing to undo."); // Daha kullanıcı dostu mesaj
-        }
+            JOptionPane.showMessageDialog(null, "Nothing to undo."); }
     }
 }
 

@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 
 public class AdminController {
     private AdminView adminView;
-    private Connection connection; // Tek bir bağlantı üzerinden işlem yapılacak
+    private Connection connection;
 
     public AdminController(AdminView adminView) {
         this.adminView = adminView;

@@ -25,7 +25,6 @@ public class CancelRentalCommand implements Command {
         try {
             connection.setAutoCommit(false);
 
-            // Rezervasyon bilgilerini kaydet
             String fetchQuery = "SELECT user_id, reservation_date_start, reservation_date_end FROM reservations WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(fetchQuery)) {
                 stmt.setInt(1, reservationId);
@@ -38,14 +37,12 @@ public class CancelRentalCommand implements Command {
                 }
             }
 
-            // Rezervasyonu sil
             String deleteQuery = "DELETE FROM reservations WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
                 stmt.setInt(1, reservationId);
                 stmt.executeUpdate();
             }
 
-            // Arabayı tekrar kullanılabilir yap
             String updateCarQuery = "UPDATE cars SET availability = TRUE WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateCarQuery)) {
                 stmt.setInt(1, carId);
@@ -68,7 +65,6 @@ public class CancelRentalCommand implements Command {
         try {
             connection.setAutoCommit(false);
 
-            // Rezervasyonu geri ekle
             String insertQuery = "INSERT INTO reservations (id, car_id, user_id, reservation_date_start, reservation_date_end) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(insertQuery)) {
                 stmt.setInt(1, reservationId);
@@ -79,7 +75,6 @@ public class CancelRentalCommand implements Command {
                 stmt.executeUpdate();
             }
 
-            // Arabayı tekrar rezerve edilemez yap
             String updateCarQuery = "UPDATE cars SET availability = FALSE WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateCarQuery)) {
                 stmt.setInt(1, carId);

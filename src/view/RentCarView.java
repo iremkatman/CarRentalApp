@@ -17,11 +17,12 @@ public class RentCarView extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        // Top Panel with Balance
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel titleLabel = new JLabel("Rent A Car", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(169, 169, 169));
         topPanel.add(titleLabel, BorderLayout.NORTH);
 
         currentBalanceLabel = new JLabel("Current Balance: $" + currentUser.getBudget(), SwingConstants.RIGHT);
@@ -31,36 +32,49 @@ public class RentCarView extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // Car Table with Base Price
         String[] columnNames = {"Model", "Type", "Base Price"};
-        Object[][] data = {}; // Data will be populated by the controller
+        Object[][] data = {};
         carTable = new JTable(data, columnNames);
+        carTable.setFillsViewportHeight(true);
         add(new JScrollPane(carTable), BorderLayout.CENTER);
 
-        // Right Panel with options
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        fullFuelCheckBox = new JCheckBox("Full Tank Fuel (+$50)");
-        insuranceCheckBox = new JCheckBox("Daily Temporary Insurance (+$30)");
+        JLabel pricingLabel = new JLabel("Select a pricing model:", SwingConstants.LEFT);
+        pricingLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        pricingLabel.setForeground(new Color(70, 130, 180));
+
         pricingModelComboBox = new JComboBox<>(new String[]{
                 "Hourly - No Discount",
                 "Daily - 10% Discount",
                 "Weekly - 25% Discount"
         });
+        pricingModelComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        JLabel pricingLabel = new JLabel("Select a pricing model:", SwingConstants.LEFT);
+        fullFuelCheckBox = new JCheckBox("Full Tank Fuel (+$50)");
+        fullFuelCheckBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        fullFuelCheckBox.setBackground(new Color(240, 248, 255));
+
+        insuranceCheckBox = new JCheckBox("Daily Temporary Insurance (+$30)");
+        insuranceCheckBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        insuranceCheckBox.setBackground(new Color(240, 248, 255));
+
         JLabel noteLabel = new JLabel("Select a pricing model to see the discount applied.", SwingConstants.LEFT);
         noteLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         noteLabel.setForeground(Color.BLUE);
 
         totalCostLabel = new JLabel("Total Cost: $0.0", SwingConstants.LEFT);
-        totalCostLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        totalCostLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        totalCostLabel.setForeground(new Color(220, 20, 60));
 
         rightPanel.add(pricingLabel);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         rightPanel.add(pricingModelComboBox);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         rightPanel.add(fullFuelCheckBox);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         rightPanel.add(insuranceCheckBox);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         rightPanel.add(noteLabel);
@@ -69,10 +83,17 @@ public class RentCarView extends JFrame {
 
         add(rightPanel, BorderLayout.EAST);
 
-        // Bottom Panel with buttons
         JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
         rentButton = new JButton("Rent Selected Car");
+        rentButton.setFont(new Font("Arial", Font.BOLD, 14));
+        rentButton.setBackground(new Color(169, 169, 169));
+        rentButton.setForeground(Color.WHITE);
+
         backButton = new JButton("Back");
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setBackground(new Color(220, 20, 60));
+        backButton.setForeground(Color.WHITE);
 
         bottomPanel.add(rentButton);
         bottomPanel.add(backButton);

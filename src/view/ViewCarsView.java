@@ -16,6 +16,7 @@ public class ViewCarsView extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
         JPanel topPanel = new JPanel(new GridLayout(1, 3));
         modelFilterField = new JTextField();

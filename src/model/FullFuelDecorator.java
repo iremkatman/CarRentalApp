@@ -1,7 +1,7 @@
 package model;
 
 public class FullFuelDecorator extends CarDecorator {
-    private static final double FULLFUEL_COST = 50.0; // Sabit full-fuel maliyeti
+    private static final double FULLFUEL_COST = 50.0;
 
     public FullFuelDecorator(Car decoratedCar) {
         super(decoratedCar);
@@ -25,6 +25,6 @@ public class FullFuelDecorator extends CarDecorator {
 
     @Override
     public double getCost(int duration) {
-        return FULLFUEL_COST; // Sabit full-fuel maliyeti
+        return FULLFUEL_COST;
     }
 }

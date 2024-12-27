@@ -15,15 +15,14 @@ public class DepositMoneyController {
     private DepositMoneyView depositMoneyView;
     private User currentUser;
     private WelcomeView welcomeView;
-    private Connection connection; // Tek bir bağlantı üzerinden işlem yapılacak
+    private Connection connection;
 
     public DepositMoneyController(DepositMoneyView depositMoneyView, User currentUser, WelcomeView welcomeView) {
         this.depositMoneyView = depositMoneyView;
         this.currentUser = currentUser;
         this.welcomeView = welcomeView;
-        this.connection =SingletonConnection.getInstance(); // Bağlantı burada alınıyor
+        this.connection =SingletonConnection.getInstance();
 
-        // Kullanıcının mevcut bütçesini görüntüle
         loadUserBudget();
         depositMoneyView.getDepositButton().addActionListener(e -> depositMoney());
         depositMoneyView.getBackButton().addActionListener(e -> goBackToWelcome());
@@ -38,7 +37,7 @@ public class DepositMoneyController {
 
             if (rs.next()) {
                 double budget = rs.getDouble("budget");
-                currentUser.setBudget(budget); // Kullanıcı nesnesini güncelle
+                currentUser.setBudget(budget);
                 depositMoneyView.getCurrentBalanceLabel().setText("Current Balance: $" + budget);
             } else {
                 JOptionPane.showMessageDialog(depositMoneyView, "User not found in the database!");
@@ -58,7 +57,6 @@ public class DepositMoneyController {
                 return;
             }
 
-            // Veritabanı işlemleri
             try {
                 String updateBudgetQuery = "UPDATE users SET budget = budget + ? WHERE id = ?";
                 PreparedStatement updateStmt = connection.prepareStatement(updateBudgetQuery);
@@ -67,8 +65,7 @@ public class DepositMoneyController {
                 int rowsAffected = updateStmt.executeUpdate();
 
                 if (rowsAffected > 0) {
-                    // Model güncellemesi
-                    currentUser.setBudget(currentUser.getBudget() + amount); // Observer'ları otomatik bilgilendirir
+                    currentUser.setBudget(currentUser.getBudget() + amount);
                     JOptionPane.showMessageDialog(depositMoneyView, "Deposit successful!");
                 } else {
                     JOptionPane.showMessageDialog(depositMoneyView, "Failed to update user budget in the database.");
@@ -84,8 +81,7 @@ public class DepositMoneyController {
 
 
     private void goBackToWelcome() {
-        // WelcomeView'deki bütçeyi güncelle
-        welcomeView.setVisible(true); // WelcomeView'i tekrar göster
-        depositMoneyView.dispose();  // DepositMoneyView'i kapat
+        welcomeView.setVisible(true);
+        depositMoneyView.dispose();
     }
 }

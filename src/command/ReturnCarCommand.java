@@ -10,9 +10,9 @@ import java.sql.ResultSet;
 public class ReturnCarCommand implements Command {
     private int reservationId;
     private int carId;
-    private int userId; // Kullanıcı ID'si undo için saklanacak
-    private String startDate; // Rezervasyon başlangıç tarihi
-    private String endDate;   // Rezervasyon bitiş tarihi
+    private int userId;
+    private String startDate;
+    private String endDate;
     private Connection connection;
 
     public ReturnCarCommand(int reservationId, int carId) {
@@ -26,7 +26,6 @@ public class ReturnCarCommand implements Command {
         try {
             connection.setAutoCommit(false);
 
-            // Rezervasyon detaylarını al
             String fetchQuery = "SELECT user_id, reservation_date_start, reservation_date_end FROM reservations WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(fetchQuery)) {
                 stmt.setInt(1, reservationId);
@@ -39,14 +38,12 @@ public class ReturnCarCommand implements Command {
                 }
             }
 
-            // Rezervasyonu sil
             String deleteQuery = "DELETE FROM reservations WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
                 stmt.setInt(1, reservationId);
                 stmt.executeUpdate();
             }
 
-            // Arabayı tekrar kiralanabilir yap
             String updateCarQuery = "UPDATE cars SET availability = TRUE WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateCarQuery)) {
                 stmt.setInt(1, carId);
@@ -69,7 +66,6 @@ public class ReturnCarCommand implements Command {
         try {
             connection.setAutoCommit(false);
 
-            // Rezervasyonu geri ekle
             String insertQuery = "INSERT INTO reservations (id, car_id, user_id, reservation_date_start, reservation_date_end) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(insertQuery)) {
                 stmt.setInt(1, reservationId);
@@ -80,7 +76,6 @@ public class ReturnCarCommand implements Command {
                 stmt.executeUpdate();
             }
 
-            // Arabayı tekrar kiralanamaz yap
             String updateCarQuery = "UPDATE cars SET availability = FALSE WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateCarQuery)) {
                 stmt.setInt(1, carId);

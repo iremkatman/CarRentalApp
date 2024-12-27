@@ -1,4 +1,3 @@
-// --- Service Layer ---
 package service;
 
 import database.SingletonConnection;

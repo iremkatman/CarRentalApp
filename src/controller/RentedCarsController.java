@@ -121,34 +121,29 @@ public class RentedCarsController {
             return;
         }
 
-        // Tablo verilerini al
         String startDateStr = (String) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 3);
         String endDateStr = (String) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 4);
 
-        // Tarih formatını tanımla
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         try {
-            // Tarihleri parse et
             LocalDate startDate = LocalDateTime.parse(startDateStr, formatter).toLocalDate();
             LocalDate endDate = LocalDateTime.parse(endDateStr, formatter).toLocalDate();
 
-            // Kontroller
             if (LocalDate.now().isBefore(startDate)) {
                 JOptionPane.showMessageDialog(rentedCarsView,
                         "You cannot return the car before the start date, but you can cancel the reservation.");
-                return; // İşlem sonlanır
+                return;
             }
 
             if (LocalDate.now().isBefore(endDate)) {
                 JOptionPane.showMessageDialog(rentedCarsView, "You cannot return the car before the end date.");
-                return; // İşlem sonlanır
+                return;
             }
 
             int reservationId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 0);
             int carId = (int) rentedCarsView.getRentedCarTable().getValueAt(selectedRow, 1);
 
-            // Return işlemini başlat
             ReturnCarCommand returnCarCommand = new ReturnCarCommand(reservationId, carId);
             commandInvoker.executeCommand(returnCarCommand);
 

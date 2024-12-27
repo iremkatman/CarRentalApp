@@ -15,16 +15,14 @@ public class WelcomeView extends JFrame implements Observer {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        // Observer olarak kendini ekle
         currentUser.addObserver(this);
 
-        // Bütçe Label
         budgetLabel = new JLabel("Current Balance: $" + currentUser.getBudget(), SwingConstants.CENTER);
         budgetLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         add(budgetLabel, BorderLayout.NORTH);
 
-        // Welcome Label
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
         JLabel welcomeLabel = new JLabel("Welcome, " + currentUser.getFirstName() + " " + currentUser.getLastName());
@@ -39,7 +37,6 @@ public class WelcomeView extends JFrame implements Observer {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(5, 1, 10, 10));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
@@ -69,7 +66,6 @@ public class WelcomeView extends JFrame implements Observer {
 
         add(buttonPanel, BorderLayout.WEST);
 
-        // Right Panel with Image
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
         JLabel pictureLabel = new JLabel();
@@ -83,11 +79,9 @@ public class WelcomeView extends JFrame implements Observer {
         rightPanel.add(pictureLabel, BorderLayout.CENTER);
         add(rightPanel, BorderLayout.EAST);
 
-        // Set visible
         setVisible(true);
     }
 
-    // Observer'dan gelen güncellemeleri işlemek için metot
     @Override
     public void update(double newBudget) {
         budgetLabel.setText("Current Balance: $" + newBudget);
