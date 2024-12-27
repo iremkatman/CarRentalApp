@@ -8,6 +8,7 @@ import view.WelcomeView;
 import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -95,16 +96,15 @@ public class RentCarController {
         Car selectedCar = carList.get(selectedRow);
         PricingStrategy pricingStrategy = getPricingStrategy(selectedPricingModel);
 
-        Car decoratedCar = selectedCar;
-
+        List<CarDecorator> decorators = new ArrayList<>();
         if (rentCarView.getFullFuelCheckBox().isSelected()) {
-            decoratedCar = new FullFuelDecorator(decoratedCar);
+            decorators.add(new FullFuelDecorator(selectedCar));
         }
         if (rentCarView.getInsuranceCheckBox().isSelected()) {
-            decoratedCar = new InsuranceDecorator(decoratedCar);
+            decorators.add(new InsuranceDecorator(selectedCar));
         }
 
-        double estimatedCost = carRentalFacade.calculateTotalCost(decoratedCar, pricingStrategy, selectedDuration);
+        double estimatedCost = carRentalFacade.calculateTotalCost(selectedCar, pricingStrategy, selectedDuration, decorators);
         rentCarView.getTotalCostLabel().setText(String.format("Estimated Cost: $%.2f", estimatedCost));
     }
 
@@ -143,18 +143,17 @@ public class RentCarController {
             return;
         }
 
-        Car decoratedCar = selectedCar;
-
+        List<CarDecorator> decorators = new ArrayList<>();
         if (rentCarView.getFullFuelCheckBox().isSelected()) {
-            decoratedCar = new FullFuelDecorator(decoratedCar);
+            decorators.add(new FullFuelDecorator(selectedCar));
         }
         if (rentCarView.getInsuranceCheckBox().isSelected()) {
-            decoratedCar = new InsuranceDecorator(decoratedCar);
+            decorators.add(new InsuranceDecorator(selectedCar));
         }
 
         PricingStrategy pricingStrategy = getPricingStrategy(selectedPricingModel);
 
-        double totalCost = carRentalFacade.calculateTotalCost(decoratedCar, pricingStrategy, selectedDuration);
+        double totalCost = carRentalFacade.calculateTotalCost(selectedCar, pricingStrategy, selectedDuration, decorators);
 
         if (currentUser.getBudget() < totalCost) {
             JOptionPane.showMessageDialog(rentCarView,
@@ -162,7 +161,7 @@ public class RentCarController {
             return;
         }
 
-        carRentalFacade.processReservation(decoratedCar, currentUser, selectedPricingModel, selectedDuration, totalCost, startDateTime);
+        carRentalFacade.processReservation(selectedCar, currentUser, selectedPricingModel, selectedDuration, totalCost, startDateTime);
         refreshTableAndBudget();
     }
 

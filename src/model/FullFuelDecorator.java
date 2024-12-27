@@ -17,14 +17,14 @@ public class FullFuelDecorator extends CarDecorator {
         return decoratedCar.getModel() + " (with FullFuel)";
     }
 
+
     @Override
     public double getBasePrice() {
         return decoratedCar.getBasePrice();
     }
 
     @Override
-    public double getCost() {
+    public double getCost(int duration) {
         return FULLFUEL_COST; // Sabit full-fuel maliyeti
     }
-
 }

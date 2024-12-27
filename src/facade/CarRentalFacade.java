@@ -1,42 +1,28 @@
 package facade;
 
 import model.PricingStrategy;
-import database.SingletonConnection;
 import model.*;
+import service.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CarRentalFacade {
 
-    private Connection connection = SingletonConnection.getInstance();
+    private final CarService carService;
+    private final ReservationService reservationService;
+    private final UserService userService;
+
+    public CarRentalFacade() {
+        this.carService = new CarService();
+        this.reservationService = new ReservationService();
+        this.userService = new UserService();
+    }
 
     public List<Car> fetchAvailableCars() {
-        List<Car> cars = new ArrayList<>();
-        String query = "SELECT * FROM cars WHERE availability = TRUE";
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                cars.add(CarFactory.createCar(
-                        rs.getString("type"),
-                        rs.getInt("id"),
-                        rs.getString("model"),
-                        rs.getBoolean("availability"),
-                        rs.getDouble("price_per_day")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return cars;
+        return carService.fetchAvailableCars();
     }
 
     public void populateCarTable(List<Car> carList, JTable carTable, JLabel currentBalanceLabel, User currentUser) {
@@ -55,71 +41,40 @@ public class CarRentalFacade {
         currentBalanceLabel.setText(String.format("Current Balance: $%.2f", currentUser.getBudget()));
     }
 
-    public double calculateTotalCost(Car decoratedCar, PricingStrategy pricingStrategy, int duration) {
-        double baseCost = pricingStrategy.calculatePrice(decoratedCar.getBasePrice(), duration);
-        double decoratorCost = 0;
-
-        if (decoratedCar instanceof FullFuelDecorator) {
-            decoratorCost += ((FullFuelDecorator) decoratedCar).getCost();
+    public double calculateTotalCost(Car car, PricingStrategy pricingStrategy, int duration, List<CarDecorator> decorators) {
+        double baseCost = pricingStrategy.calculatePrice(car.getBasePrice(), duration);
+        for (CarDecorator decorator : decorators) {
+            baseCost += decorator.getCost(duration);
         }
-        if (decoratedCar instanceof InsuranceDecorator) {
-            decoratorCost += ((InsuranceDecorator) decoratedCar).getCost() * duration;
-        }
-
-        return baseCost + decoratorCost;
+        return baseCost;
     }
 
     public void processReservation(Car selectedCar, User currentUser, String pricingModel, int duration, double totalCost, LocalDateTime startDateTime) {
-        LocalDateTime now = startDateTime;
-        LocalDateTime returnDate;
+        LocalDateTime returnDate = calculateReturnDate(pricingModel, startDateTime, duration);
 
-        switch (pricingModel) {
-            case "Hourly - No Discount":
-                returnDate = now.plusHours(duration);
-                break;
-            case "Daily - 10% Discount":
-                returnDate = now.plusDays(duration);
-                break;
-            case "Weekly - 25% Discount":
-                returnDate = now.plusWeeks(duration);
-                break;
-            default:
-                returnDate = now;
-        }
+        reservationService.createReservation(
+                selectedCar.getId(), currentUser.getId(), startDateTime, returnDate);
+        carService.updateCarAvailability(selectedCar.getId(), false);
+        userService.updateUserBudget(currentUser.getId(), currentUser.getBudget() - totalCost);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedStartDate = now.format(formatter);
-        String formattedEndDate = returnDate.format(formatter);
-
-        try (PreparedStatement stmt = connection.prepareStatement(
-                "UPDATE cars SET availability = FALSE WHERE id = ?")) {
-            stmt.setInt(1, selectedCar.getId());
-            stmt.executeUpdate();
-
-            String reservationQuery = "INSERT INTO reservations (car_id, user_id, reservation_date_start, reservation_date_end) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement resStmt = connection.prepareStatement(reservationQuery)) {
-                resStmt.setInt(1, selectedCar.getId());
-                resStmt.setInt(2, currentUser.getId());
-                resStmt.setString(3, formattedStartDate);
-                resStmt.setString(4, formattedEndDate);
-                resStmt.executeUpdate();
-            }
-
-            String updateBudgetQuery = "UPDATE users SET budget = ? WHERE id = ?";
-            try (PreparedStatement updateStmt = connection.prepareStatement(updateBudgetQuery)) {
-                updateStmt.setDouble(1, currentUser.getBudget() - totalCost);
-                updateStmt.setInt(2, currentUser.getId());
-                updateStmt.executeUpdate();
-            }
-
-            currentUser.setBudget(currentUser.getBudget() - totalCost);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        currentUser.setBudget(currentUser.getBudget() - totalCost);
 
         JOptionPane.showMessageDialog(null,
                 "Car rented successfully: " + selectedCar.getModel() +
                         "\nTotal Cost: $" + totalCost +
-                        "\nReturn Date: " + formattedEndDate);
+                        "\nReturn Date: " + returnDate);
+    }
+
+    private LocalDateTime calculateReturnDate(String pricingModel, LocalDateTime startDateTime, int duration) {
+        switch (pricingModel) {
+            case "Hourly - No Discount":
+                return startDateTime.plusHours(duration);
+            case "Daily - 10% Discount":
+                return startDateTime.plusDays(duration);
+            case "Weekly - 25% Discount":
+                return startDateTime.plusWeeks(duration);
+            default:
+                throw new IllegalArgumentException("Invalid pricing model.");
+        }
     }
 }

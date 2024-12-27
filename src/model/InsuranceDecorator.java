@@ -23,8 +23,9 @@ public class InsuranceDecorator extends CarDecorator {
     }
 
     @Override
-    public double getCost() {
-        return INSURANCE_COST_PER_DAY ; // Sigorta maliyeti, gün sayısına göre
+    public double getCost(int duration) {
+        return INSURANCE_COST_PER_DAY * duration; // Sigorta maliyeti, gün sayısına göre
     }
-
 }
+
+

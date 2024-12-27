@@ -27,5 +27,6 @@ public abstract class CarDecorator implements Car {
         decoratedCar.setAvailable(available);
     }
 
-    public abstract double getCost();
+
+    public abstract double getCost(int duration);
 }
